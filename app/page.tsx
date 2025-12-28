@@ -1,64 +1,111 @@
-import Image from "next/image";
+"use client"
+import {getCurrentWeatherInfo, getUserLocationInfo, getEnviromentInfo } from "./utils/api";
+import { useState, useEffect, use } from "react";
+
+type WeatherInfo = {
+  current_celsius: number;
+  current_faren: number;
+  current_sensacion_c: number;
+  current_condition_text: string;
+  current_condition_img: string;
+};
+
+type LocationInfo = {
+  name: string;
+  region: string;
+  country: string;
+  localtime: string;
+};
+
+type EnviromentInfo ={
+  wind_kph: number;
+  wind_dir: number;
+  humidity: number;
+  cloud: number;
+}
 
 export default function Home() {
+
+  const [locationInfo, setLocationInfo] = useState<LocationInfo | null>(null);
+  const [weatherInfo, setWeatherInfo] = useState<WeatherInfo | null>(null);
+  const [enviromentInfo, setEnviromentInfo] = useState<EnviromentInfo | null>(null);
+  
+  useEffect(() => {
+    async function loadWeatherInfo()
+      {
+        const weather_response = await getCurrentWeatherInfo();
+        setWeatherInfo(weather_response);
+      }
+      loadWeatherInfo();
+  },[]);
+
+  useEffect(() => {
+    async function loadLocationInfo()
+      {
+        const info_response = await getUserLocationInfo();
+        setLocationInfo(info_response);
+      }
+      loadLocationInfo();
+  },[]);
+
+  useEffect(() => {
+    async function loadEnviromentInfo()
+      {
+        const condition_response = await getEnviromentInfo();
+        setEnviromentInfo(condition_response);
+      }
+      loadEnviromentInfo();
+  },[]);
+  
+
   return (
+
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
       <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+        {locationInfo && (
+          <>
+            <h1 className="text-3xl font-semibold">
+              {locationInfo.name}, {locationInfo.region}
+            </h1>
+            <p className="text-sm text-zinc-500">
+              {locationInfo.country} — {locationInfo.localtime}
+            </p>
+          </>
+        )}
+
+        <h2 className="mt-6 text-5xl">
+          {weatherInfo?.current_celsius}°C
+        </h2>
+
+        <h2 className="mt-6 text-5xl">
+          Sensación térmica: {weatherInfo?.current_sensacion_c}°C
+        </h2>
+
+        <p className="text-lg text-zinc-600">
+          {weatherInfo?.current_faren}°F
+        </p>
+
+        <h2 className="mt-6 text-5xl">
+          {weatherInfo?.current_condition_text}
+        </h2>
+
+        <img src={weatherInfo?.current_condition_img} alt="" />
+
+        <h2 className="mt-6 text-5xl">
+          {enviromentInfo?.wind_kph}
+        </h2>
+
+        <h2 className="mt-6 text-5xl">
+          {enviromentInfo?.wind_dir}
+        </h2>
+
+        <h2 className="mt-6 text-5xl">
+          {enviromentInfo?.humidity}
+        </h2>
+
+        <h2 className="mt-6 text-5xl">
+          {enviromentInfo?.cloud}
+        </h2>
       </main>
     </div>
   );
