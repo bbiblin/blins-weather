@@ -20,6 +20,7 @@ type EnviromentInfo ={
   wind_dir: number;
   humidity: number;
   cloud: number;
+  is_day: number;
 }
 
 export async function getCurrentWeatherInfo(): Promise<WeatherInfo> {
@@ -122,6 +123,7 @@ export async function getEnviromentInfo(): Promise<EnviromentInfo>{
             wind_kph: current.wind_kph,
             humidity: current.humidity,
             cloud: current.cloud,
+            is_day: current.is_day,
     };
     }
     catch (error)

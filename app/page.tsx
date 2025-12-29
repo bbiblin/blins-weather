@@ -1,6 +1,7 @@
 "use client"
 import {getCurrentWeatherInfo, getUserLocationInfo, getEnviromentInfo } from "./utils/api";
 import { useState, useEffect, use } from "react";
+import WeatherCard  from "./components/weatherCard"
 
 type WeatherInfo = {
   current_celsius: number;
@@ -22,7 +23,9 @@ type EnviromentInfo ={
   wind_dir: number;
   humidity: number;
   cloud: number;
+  is_day: number;
 }
+
 
 export default function Home() {
 
@@ -56,57 +59,42 @@ export default function Home() {
       }
       loadEnviromentInfo();
   },[]);
+
+  const isReady = locationInfo && weatherInfo && enviromentInfo;
+
+  
+  const isDay = enviromentInfo?.is_day === 1;
+
+  const backgroundClass = isDay
+  ? "bg-linear-to-b from-[#ffe8dc] via-[#F4D2CD] to-[#E2B7BE]"
+  : "bg-linear-to-b from-[#E1B6DB] via-[#B5A5D3] to-[#8B8FB0]";
   
 
-  return (
+return (
+  <div
+  className={`flex min-h-screen w-full overflow-x-hidden items-center justify-center font-sans transition-colors duration-700 ${backgroundClass}`}>
 
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        {locationInfo && (
-          <>
-            <h1 className="text-3xl font-semibold">
-              {locationInfo.name}, {locationInfo.region}
-            </h1>
-            <p className="text-sm text-zinc-500">
-              {locationInfo.country} — {locationInfo.localtime}
-            </p>
-          </>
-        )}
-
+    {isReady && (
+      <main className=" flex w-full max-w-3xl flex-col items-center justify-center gap-6 px-4 py-24 sm:px-8 md:px-16">        
+        <h1 className="text-3xl font-semibold">
+          <p className="text-sm text-zinc-500">
+            {locationInfo.country} — {locationInfo.localtime}
+          </p>
+          <WeatherCard/>
+        </h1>
         <h2 className="mt-6 text-5xl">
-          {weatherInfo?.current_celsius}°C
+          {weatherInfo.current_condition_text}
         </h2>
 
-        <h2 className="mt-6 text-5xl">
-          Sensación térmica: {weatherInfo?.current_sensacion_c}°C
-        </h2>
+        <img src={weatherInfo.current_condition_img} alt="" />
 
-        <p className="text-lg text-zinc-600">
-          {weatherInfo?.current_faren}°F
-        </p>
-
-        <h2 className="mt-6 text-5xl">
-          {weatherInfo?.current_condition_text}
-        </h2>
-
-        <img src={weatherInfo?.current_condition_img} alt="" />
-
-        <h2 className="mt-6 text-5xl">
-          {enviromentInfo?.wind_kph}
-        </h2>
-
-        <h2 className="mt-6 text-5xl">
-          {enviromentInfo?.wind_dir}
-        </h2>
-
-        <h2 className="mt-6 text-5xl">
-          {enviromentInfo?.humidity}
-        </h2>
-
-        <h2 className="mt-6 text-5xl">
-          {enviromentInfo?.cloud}
-        </h2>
+        <h2 className="mt-6 text-5xl">{enviromentInfo.wind_kph}</h2>
+        <h2 className="mt-6 text-5xl">{enviromentInfo.wind_dir}</h2>
+        <h2 className="mt-6 text-5xl">{enviromentInfo.humidity}</h2>
+        <h2 className="mt-6 text-5xl">{enviromentInfo.cloud}</h2>
       </main>
-    </div>
-  );
+    )}
+  </div>
+);
+
 }
